@@ -1,0 +1,66 @@
+<!doctype html>
+<html>
+    <head>
+        <meta charset="utf-8" />
+
+        <link rel="stylesheet" type="text/css" href="http://ajax.googleapis.com/ajax/libs/dojo/1.6/dojo/resources/dojo.css">
+        <link rel="stylesheet" type="text/css" href="http://ajax.googleapis.com/ajax/libs/dojo/1.6/dijit/themes/tundra/tundra.css">
+
+        <script src="http://github.com/downloads/SteveSanderson/knockout/knockout-1.2.1.js"></script>
+        <script>djConfig = {parseOnLoad: true};</script>
+        <script src="http://ajax.googleapis.com/ajax/libs/dojo/1.6/dojo/dojo.xd.js"></script>
+        <script src="ko_dojo.js"></script>
+        <script>
+            dojo.require("dijit.form.Button");
+            dojo.require("dijit.form.TextBox");
+            dojo.require("dijit.form.CurrencyTextBox");
+            dojo.require("dijit.form.CheckBox");
+            dojo.require("dijit.form.RadioButton");
+            dojo.require("dijit.form.Form");
+            dojo.require("dojo.parser");
+
+            var viewModel = {
+                firstName: ko.observable(),
+                amount: ko.observable(),
+                textAmount: ko.observable(),
+                agree: ko.observable(),
+                drink: ko.observable()
+            };
+
+            viewModel.message = ko.dependentObservable(function(){
+                if (this.firstName() && this.textAmount())
+                    return "Hello, " + this.firstName() + ", you owe me " + this.textAmount();
+            }, viewModel);
+
+            dojo.ready(function(){
+                ko.applyBindings(viewModel);
+                bindDojoAndKnockout({elementId: 'firstName', observable: viewModel.firstName});
+                bindDojoAndKnockout({elementId: 'amount', observable: viewModel.amount});
+                bindDojoAndKnockout({
+                    elementId: 'amount',
+                    observable: viewModel.textAmount,
+                    elementAttribute: 'displayedValue',
+                    knockoutObservableHandler: null // we don't have to react on changing viewModel.textAmount
+                });
+                bindDojoAndKnockout({elementId: 'agree', elementAttribute: 'checked', observable: viewModel.agree});
+                bindDojoAndKnockout({elements: 'input[type=radio]', observable: viewModel.drink})
+            });
+        </script>
+    </head>
+    <body class="tundra">
+        <input type="text" name="firstName" data-dojo-type="dijit.form.TextBox" id="firstName">
+        <input type="text" name="amount" data-dojo-type="dijit.form.CurrencyTextBox" id="amount">
+        <input type="checkbox" name="agree" data-dojo-type="dijit.form.CheckBox" id="agree"> <span data-bind="visible: agree">agree!</span> <br />
+        <p data-bind="text: message"></p>
+
+        <form id="radioForm" data-dojo-type="dijit.form.Form">
+            <label>
+                <input type="radio" name="drink" dojoType="dijit.form.RadioButton" value="coffee" id="coffeeButton"> Coffee
+            </label>
+            <label>
+                <input type="radio" name="drink" dojoType="dijit.form.RadioButton" value="tea" id="teaButton"> Tea
+            </label>
+        </form>
+        <p data-bind="visible: drink">You have chosen <span data-bind="text: drink"></span></p>
+    </body>
+</html>
